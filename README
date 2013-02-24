@@ -3,3 +3,9 @@ Author: M@
 
 Quick dump of the code for this which I haven't looked at in a couple years
 
+pointer.pde = The arduino script in it's final form before disassembling the device
+
+processing DIR = processing code
+  processing.pde = processing script that shows some of the extrapolation
+  
+movide DIR = demonstration movie collateral
