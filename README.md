@@ -12,12 +12,14 @@ Future goal is to have it read news stories from an API, figure out their locati
 ![Suez Canal](images/suez_canal.jpg)
 
 ## Parts
-* Raspberry pi 4 (get SD card required, micro HDMI cable recommended)
+* Raspberry pi 4 (SD card required 16gb works for me, micro HDMI cable recommended)
 * 2 Servo's (futaba S3107 for now... might update for more accuracy)
 * Laser (I got [these laser diodes](https://www.amazon.com/gp/product/B00VCR036Q/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) a few years ago to upgrade a nerf gun)
 * Hot glue
 * A base (block of wood for me)
-* Wiring (I have tons of wiring stuff from other project)
+* Wiring (I have tons of wiring stuff from other projects)
 * A map ([NatGeo 9'x6' : $100](https://www.natgeomaps.com/re-world-executive-mural).)
 
 I tried to get this working with an ESP8266, but getting 5V to the servos was proving to be a PITA and the project was sitting next to a raspberry pi so I switched.
+
+Warning: requirements.txt and some raspberry pi gpio pin libraries not 100% automated
