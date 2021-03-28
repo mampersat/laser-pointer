@@ -18,5 +18,6 @@ Future goal is to have it read news stories from an API, figure out their locati
 * Hot glue
 * A base (block of wood for me)
 * Wiring (I have tons of wiring stuff from other project)
+* A map ([NatGeo 9'x6' : $100](https://www.natgeomaps.com/re-world-executive-mural).)
 
 I tried to get this working with an ESP8266, but getting 5V to the servos was proving to be a PITA and the project was sitting next to a raspberry pi so I switched.
