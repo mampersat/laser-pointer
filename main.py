@@ -1,9 +1,5 @@
-from gpiozero import LED, Servo
+import laser_turret as t
 import time
-
-laser = LED(18)
-h_servo = Servo(13)
-v_servo = Servo(12)
 
 locations = [
     (-1.0, 0.068, 'home_bowmap'),
@@ -16,28 +12,12 @@ locations = [
     # (-0.212, -0.152, 'top right'),
 ]
 
-def go(location):
-
-    h_servo.value = location[0]
-    v_servo.value = location[1]
-
-def goslow(location):
-
-    h_start = h_servo.value
-    v_start = v_servo.value
-
-    for d in range(1,101):
-       h_servo.value = h_start + (location[0] - h_start) * (d/100.0)
-       v_servo.value = v_start + (location[1] - v_start) * (d/100.0)
-       time.sleep(0.01) 
-
-laser.on()
-h_servo.value = 0
-v_servo.value = 0
+t.laser.on()
 
 while True:
     for location in locations:
-	goslow(location)
+	# goslow(location[0], location[1])
+        t.goslow(location[0], location[1])
         print(location[2])
-        time.sleep(1)
+        time.sleep(5)
 
