@@ -1,6 +1,7 @@
 # controls 2 servos and a laser diode
 from gpiozero import LED, Servo
 import time
+import pickle
 
 laser = LED(18)
 h_servo = Servo(13)
