@@ -1,4 +1,5 @@
 import laser_turret as t
+import os.path
 import pickle
 import time
 
@@ -33,38 +34,54 @@ def turret_to_lat_lon(h, v):
     lon = float(v) * 180
     return lat, lon
 
-def write_defaults():
-    """ Initalize the calibration pickle with reasonable values """
-
-    anchors = [
-            ('null island', 0, 0),
-            # ('London', 51.5075, -0.1278),
-            # ('Washington DC', 38.9072, -77.0369),
-            # ('Brasilia', -15.8267, -47.9218),
-            ('West', -90, 0),
-            ('North', 0, 90),
-            ('East', 90, 0),
-            ('South', 0, -90)
-    ]
-
-    pickle.dump(anchors, open("anchors.p", "wb"))
+defaults = {'null': (0,0),
+         'west': (-90,0),
+         'north': (0, 90),
+         'east': (90, 0),
+         'south': (0, -90)
+         }
 
 
 # Draw a circle around London
 t.laser.on()
 
-anchors = pickle.load(open("anchors.p", "rb"))
+if os.path.exists('anchors.p'):
+    anchors = pickle.load(open("anchors.p", "rb"))
+else:
+    anchros = defaults
+
+# add additional anchors - should be needed often
+# anchors['London'] = (51.5075, -0.1278)
+# anchors['Washington DC'] =  (38.9072, -77.0369)
+# anchors['Brasilia'] = (-15.8267, -47.9218)
+
+def project_from_lat_lon(lat, lon):
+    """ Use exsiting anchors to extrapolate to turret coord """
+    # Find 2 closest known points
+    # Calculate h as spot along east->west line
+    x1 = anchors['west'][0]
+    y1 = anchors['west'][1]
+
+    x2 = anchors['east'][0]
+    y2 = anchors['west'][1]
+
+    n = anchors['west'][2] 
+
 
 print("Use w,a,s,d keys to move pointer. W = reverse horizonal direction, A = reverse vertical direction.")
 
-for anchor_index in range(len(anchors)): #anchor in anchors:
-    anchor = anchors[anchor_index]
+for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
+    coords = anchors[anchor_key]
 
-    h, v = lat_lon_to_turret(anchor[1], anchor[2])
+    if len(coords) > 2:
+        h,v = coords[2], coords[3]
+    else:
+        h, v = lat_lon_to_turret(coords[0], coords[1])
     t.go(h, v)
 
-    print("Turret callibration.for location:", anchor[0])
-    hd = 0.01 # Horizontal Driver
+    print("Turret callibration.for location:", anchor_key, coords)
+    # My device is wired so horizonal is backwards... so neg here
+    hd = -0.01 # Horizontal Driver
     vd = 0.01 # Vertical Driver
 
     written = False
@@ -73,21 +90,27 @@ for anchor_index in range(len(anchors)): #anchor in anchors:
         value = raw_input("use w/a/s/d keys to adjust:\n")
         print(value)
         if value == 'A':
-            hd = - hd
+            h -= hd *10
         if value=='a':
             h -= hd
         if value == 'd':
             h += hd
+        if value == 'D':
+            h += hd *10
 
         if value =='W':
-            vd = -vd
+            v -= vd*10
         if value =='w':
             v -= vd
         if value =='s':
             v += vd
+        if value =='S':
+            v += vd*10
 
         if value =='p':
-            anchors[anchor_index] += (h, v)
+            anchors[anchor_key] = anchors[anchor_key][0:2]+ (h, v)
             pickle.dump(anchors, open("anchors.p", "wb"))
             written = True
 
+        if value =='x':
+            written = True
