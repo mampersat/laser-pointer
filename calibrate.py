@@ -54,6 +54,11 @@ else:
 # anchors['London'] = (51.5075, -0.1278)
 # anchors['Washington DC'] =  (38.9072, -77.0369)
 # anchors['Brasilia'] = (-15.8267, -47.9218)
+# anchors['Honolulu'] = (21.3069, -157.8583)
+# anchors['Brisbane'] = (-27.47, 153.0260)
+# anchors['Juneau'] = (58.3019, -134.4197)
+# anchors['Delhi'] = (28.7041, 77.1025)
+anchors['Antananaviro'] = (-18.8792, 47.5079)
 
 def project_from_lat_lon(lat, lon):
     """ Use exsiting anchors to extrapolate to turret coord """
@@ -79,7 +84,7 @@ for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
         h, v = lat_lon_to_turret(coords[0], coords[1])
     t.go(h, v)
 
-    print("Turret callibration.for location:", anchor_key, coords)
+    print("Turret callibration.for location: ------>", anchor_key, coords)
     # My device is wired so horizonal is backwards... so neg here
     hd = -0.01 # Horizontal Driver
     vd = 0.01 # Vertical Driver
@@ -88,7 +93,6 @@ for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
     while not written:
         t.go(h, v)
         value = raw_input("use w/a/s/d keys to adjust:\n")
-        print(value)
         if value == 'A':
             h -= hd *10
         if value=='a':

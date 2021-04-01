@@ -26,5 +26,5 @@ def goslow(h, v):
        h_value = h_start + (h - h_start) * (d/100.0)
        v_value = v_start + (v - v_start) * (d/100.0)
        go(h_value, v_value)
-       time.sleep(0.01) 
+       time.sleep(0.005) 
 
