@@ -4,6 +4,7 @@ import pickle
 import os.path
 import time
 
+
 def lat_lon_to_turret(lat, lon):
     """ Convert latitude and longitude to turret coordinates
 
@@ -49,7 +50,7 @@ t.laser.on()
 if os.path.exists('anchors.p'):
     anchors = pickle.load(open("anchors.p", "rb"))
 else:
-    anchros = defaults
+    anchors = defaults
 
 # add additional anchors - should be needed often
 # anchors['London'] = (51.5075, -0.1278)
@@ -74,48 +75,50 @@ def project_from_lat_lon(lat, lon):
     n = anchors['west'][2] 
 
 
-print("Use w,a,s,d keys to move pointer. W = reverse horizonal direction, A = reverse vertical direction.")
+if __name__ == "__main__":
 
-for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
-    coords = anchors[anchor_key]
+    print("Use w,a,s,d keys to move pointer. W = reverse horizonal direction, A = reverse vertical direction.")
 
-    if len(coords) > 2:
-        h,v = coords[2], coords[3]
-    else:
-        h, v = lat_lon_to_turret(coords[0], coords[1])
-    t.go(h, v)
+    for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
+        coords = anchors[anchor_key]
 
-    print("Turret callibration.for location: ------>", anchor_key, coords)
-    # My device is wired so horizonal is backwards... so neg here
-    hd = -0.01 # Horizontal Driver
-    vd = 0.01 # Vertical Driver
-
-    written = False
-    while not written:
+        if len(coords) > 2:
+            h,v = coords[2], coords[3]
+        else:
+            h, v = lat_lon_to_turret(coords[0], coords[1])
         t.go(h, v)
-        value = raw_input("use w/a/s/d keys to adjust:\n")
-        if value == 'A':
-            h -= hd *10
-        if value=='a':
-            h -= hd
-        if value == 'd':
-            h += hd
-        if value == 'D':
-            h += hd *10
 
-        if value =='W':
-            v -= vd*10
-        if value =='w':
-            v -= vd
-        if value =='s':
-            v += vd
-        if value =='S':
-            v += vd*10
+        print("Turret callibration.for location: ------>", anchor_key, coords)
+        # My device is wired so horizonal is backwards... so neg here
+        hd = -0.01 # Horizontal Driver
+        vd = 0.01 # Vertical Driver
 
-        if value =='p':
-            anchors[anchor_key] = anchors[anchor_key][0:2]+ (h, v)
-            pickle.dump(anchors, open("anchors.p", "wb"))
-            written = True
+        written = False
+        while not written:
+            t.go(h, v)
+            value = raw_input("use w/a/s/d keys to adjust:\n")
+            if value == 'A':
+                h -= hd *10
+            if value=='a':
+                h -= hd
+            if value == 'd':
+                h += hd
+            if value == 'D':
+                h += hd *10
 
-        if value =='x':
-            written = True
+            if value =='W':
+                v -= vd*10
+            if value =='w':
+                v -= vd
+            if value =='s':
+                v += vd
+            if value =='S':
+                v += vd*10
+
+            if value =='p':
+                anchors[anchor_key] = anchors[anchor_key][0:2]+ (h, v)
+                pickle.dump(anchors, open("anchors.p", "wb"))
+                written = True
+
+            if value =='x':
+                written = True
