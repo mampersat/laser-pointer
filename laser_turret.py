@@ -3,9 +3,9 @@ from gpiozero import LED, Servo
 import time
 import pickle
 
-laser = LED(18)
+laser = LED(26)
 h_servo = Servo(13)
-v_servo = Servo(12)
+v_servo = Servo(19)
 
 def go(h, v):
     """ Update the servo locations

@@ -11,5 +11,5 @@ while True:
         print(key)
         
         t.goslow(anchors[key][2], anchors[key][3])
-        time.sleep(1)
+        time.sleep(10)
 
