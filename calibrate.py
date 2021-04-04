@@ -1,6 +1,7 @@
 import laser_turret as t
 import os.path
 import pickle
+import os.path
 import time
 
 def lat_lon_to_turret(lat, lon):

@@ -23,3 +23,21 @@ Future goal is to have it read news stories from an API, figure out their locati
 I tried to get this working with an ESP8266, but getting 5V to the servos was proving to be a PITA and the project was sitting next to a raspberry pi so I switched.
 
 Warning: requirements.txt and some raspberry pi gpio pin libraries not 100% automated
+```
+export GPIOZERO_PIN_FACTORY=pigpio
+sudo pigpiod
+```
+
+## Callibration
+Point to a well known point and allow user to adjust with keyboard
+
+Detecting keyboard input is IMPOSSIBLE I think.
+pygame + pynput require a display to be connected
+
+Honalulu
+Brisbane
+
+## Projection
+Not 100% perfect, but here's the plan
+1. Manually locate a bunch of points using calibration setup
+1. To project a new point, find the 2 closest and extrapolate along a line between them
