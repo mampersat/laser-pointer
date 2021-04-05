@@ -61,10 +61,9 @@ else:
 # anchors['Juneau'] = (58.3019, -134.4197)
 # anchors['Delhi'] = (28.7041, 77.1025)
 # anchors['Antananaviro'] = (-18.8792, 47.5079)
-anchors['Dubai'] =(25.2048493, 55.2707828)
-anchors['Paris'] = (48.856614, 2.3522219)
-anchors['Palma'] = (39.5696005, 2.6501603)
-anchors['Taiwan'] = (23.69781, 120.960515)
+# anchors['Dubai'] =(25.2048493, 55.2707828)
+# anchors['Paris'] = (48.856614, 2.3522219)
+# anchors['Taiwan'] = (23.69781, 120.960515)
 
 def project_from_lat_lon(lat, lon):
     """ Use exsiting anchors to extrapolate to turret coord """
