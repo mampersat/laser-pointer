@@ -4,6 +4,7 @@ import api_keys
 import laser_turret
 import projection
 import time
+import os
 
 def get_news():
     """ Get list of news headlines"""
@@ -51,7 +52,11 @@ for article in news:
         location_string = str(ents[0])
         location = get_location(location_string)
     # print(title, ':', get_location(title))
-    print(title, ':', location )
+
+    os.system('clear')
+    print(title)
+    print(article['description'])
+    print(f'location terms found: {location}')
     if location:
         h,v = projection.algorythm_1(location[1],location[2])
         laser_turret.go(h,v)
