@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     print("Use w,a,s,d keys to move pointer. W = reverse horizonal direction, A = reverse vertical direction.")
 
-    for anchor_key in anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
+    for anchor_key in anchors:  #anchors.iterkeys(): # range(len(anchors)): #anchor in anchors:
         coords = anchors[anchor_key]
 
         if len(coords) > 2:
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         written = False
         while not written:
             t.go(h, v)
-            value = raw_input("use w/a/s/d keys to adjust:\n")
+            value = input("use w/a/s/d keys to adjust:\n")
             if value == 'A':
                 h -= hd *10
             if value=='a':

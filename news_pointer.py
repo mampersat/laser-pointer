@@ -1,6 +1,9 @@
 import requests
 import spacy
 import api_keys
+import laser_turret
+import projection
+import time
 
 def get_news():
     """ Get list of news headlines"""
@@ -37,6 +40,8 @@ def get_location(input: str):
 
 nlp = spacy.load('en_core_web_sm')
 
+laser_turret.laser.on()
+
 news = get_news()
 for article in news:
     title = article['title']
@@ -47,4 +52,9 @@ for article in news:
         location = get_location(location_string)
     # print(title, ':', get_location(title))
     print(title, ':', location )
+    if location:
+        h,v = projection.algorythm_1(location[1],location[2])
+        laser_turret.go(h,v)
+
+    time.sleep(10)
                 
