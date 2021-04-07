@@ -14,5 +14,5 @@ while True:
             t.goslow(anchors[key][2], anchors[key][3])
         else:
             print(f'Uncalibrated anchor {key}')
-        time.sleep(1)
+        time.sleep(30)
 

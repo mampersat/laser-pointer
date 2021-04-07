@@ -1,4 +1,5 @@
 import laser_turret as t
+import projection
 import os.path
 import pickle
 import os.path
@@ -64,6 +65,31 @@ else:
 # anchors['Dubai'] =(25.2048493, 55.2707828)
 # anchors['Paris'] = (48.856614, 2.3522219)
 # anchors['Taiwan'] = (23.69781, 120.960515)
+# anchors['Tokyo'] = (35.6762, 139.6503)
+
+# anchors['Tallahassee'] = (30.455000, -84.253334)
+# anchors['Vermont'] = (44.5588028, -72.57784)
+# anchors['California'] = (36.778261, -119.4179324)
+# anchors['Florida'] = (27.6648274, -81.5157535)
+# anchors['Brazil'] = (-14.235004, -51.92528)
+
+# anchors['Utah'] =  (39.3209801, -111.0937311)
+# anchors['China'] = (35.86166, 104.195397)
+# anchors['Arkansas'] = (35.20105, -91.8318334)
+
+# anchors["New York"] = (40.7127753,-74.0059728)
+# anchors["Georgia"] = (32.1656221,-82.9000751)
+# anchors["United Kingdom"] = (55.378051,-3.435973)
+# anchors["United States"] = (37.09024,-95.712891)
+
+# anchors["Ethiopia"] = (9.145000000000001,40.489673)
+# anchors["Minneapolis"] = (44.977753,-93.2650108)
+# anchors["Russia"] = (61.52401,105.318756)
+# anchors["New Zealand"] = (-40.900557,174.885971)
+# anchors["Beijing"] = (39.90419989999999,116.4073963)
+# anchors["Jerusalem"] = (31.768319,35.21371)
+
+anchors["Seoul"] = (37.566535,126.9779692)
 
 def project_from_lat_lon(lat, lon):
     """ Use exsiting anchors to extrapolate to turret coord """
@@ -90,7 +116,8 @@ if __name__ == "__main__":
             continue
             h,v = coords[2], coords[3]
         else:
-            h, v = lat_lon_to_turret(coords[0], coords[1])
+            h,v = projection.algorythm_1(coords[0],coords[1])
+            # h, v = lat_lon_to_turret(coords[0], coords[1])
         t.go(h, v)
 
         print("Turret callibration.for location: ------>", anchor_key, coords)

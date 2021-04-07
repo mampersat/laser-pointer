@@ -8,7 +8,6 @@ import os
 
 def get_news():
     """ Get list of news headlines"""
-    print('getting news headlines')
     news_api_url = 'https://newsapi.org/v2/top-headlines?sources=bbc-news&apiKey=' + api_keys.news_api_key
     r = requests.get(news_api_url)
     articles = r.json()['articles']
@@ -39,27 +38,32 @@ def get_location(input: str):
     except:
         return None
 
+
+print('loading spacy pipeline')
 nlp = spacy.load('en_core_web_sm')
 
 laser_turret.laser.on()
 
+print('getting news')
 news = get_news()
-for article in news:
-    title = article['title']
-    ents = nlp(title).ents
-    location = None
-    if len(ents):
-        location_string = str(ents[0])
-        location = get_location(location_string)
-    # print(title, ':', get_location(title))
 
-    os.system('clear')
-    print(title)
-    print(article['description'])
-    print(f'location terms found: {location}')
-    if location:
-        h,v = projection.algorythm_1(location[1],location[2])
-        laser_turret.go(h,v)
+while True: 
+    for article in news:
+        title = article['title']
+        print('parsing article text')
+        ents = nlp(title).ents
+        location = None
+        if len(ents):
+            location_string = str(ents[0])
+            location = get_location(location_string)
+   
+            if location:
+                os.system('clear')
+                print(title)
+                print(article['description'])
+                print(f'anchors["{location[0]}"] = ({location[1]},{location[2]})')
+                if location:
+                    h,v = projection.algorythm_1(location[1],location[2])
+                    laser_turret.go(h,v)
 
-    time.sleep(10)
-                
+                time.sleep(10)                
