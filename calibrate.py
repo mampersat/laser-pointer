@@ -89,6 +89,9 @@ else:
 # anchors["Beijing"] = (39.90419989999999,116.4073963)
 # anchors["Jerusalem"] = (31.768319,35.21371)
 
+anchors["Czechia"] = (49.81749199999999,15.472962)
+anchors["Myanmar"] = (21.916221,95.955974)
+
 anchors["Seoul"] = (37.566535,126.9779692)
 
 def project_from_lat_lon(lat, lon):
