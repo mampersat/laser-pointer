@@ -1,6 +1,7 @@
 import laser_turret as t
 import time
 import pickle
+import random
 import projection as p
 
 anchors = pickle.load(open("anchors.p", "rb"))
@@ -10,12 +11,14 @@ t.laser.on()
 
 while True:
     for key in anchors:
+
         print(key, anchors[key])
        
+
         if len(anchors[key]) ==4 :
-            t.goslow(anchors[key][2], anchors[key][3])
+            t.goslow(anchors[key][2], anchors[key][3], 1000)
         else:
-            # print(f'Uncalibrated anchor {key}')
+            print(f'Uncalibrated anchor {key}')
             hav = p.algorythm_1(anchors[key][0], anchors[key][1]) 
             t.goslow(hav[0], hav[1])
 

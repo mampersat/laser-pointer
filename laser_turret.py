@@ -20,6 +20,7 @@ def go(v, h):
     # adjust to new domain, 0-360 vs -180 to 180
     v = v + 180
     h = -h + 180
+    
     if not ((0 <= v <= 360) and (0 <= h <= 360)):
       print(f"{h},{v} out of range -----")
       return;
@@ -27,14 +28,16 @@ def go(v, h):
     kit.servo[0].angle = v
     kit.servo[1].angle = h
 
-def goslow(h, v):
+def goslow(v, h, duration = 100.0):
 
-    h_start = kit.servo[1].angle - 180
-    v_start = kit.servo[0].angle - 180
+    v_start = kit.servo[0].angle -180
+    h_start = 180 - kit.servo[1].angle
+    
 
-    for d in range(1,101):
-       h_value = h_start + (h - h_start) * (d/100.0)
-       v_value = v_start + (v - v_start) * (d/100.0)
-       go(h_value, v_value)
+    for d in range(1,int(duration + 1) ):
+       v_value = v_start + (v - v_start) * (d/ duration)
+       h_value = h_start + (h - h_start) * (d/ duration)
+    
+       go(v_value, h_value)
        time.sleep(0.005) 
 
