@@ -3,64 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MQTT Web Client</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <title>Mouse Coordinates over MQTT</title>
+    <!-- Ensure correct and accessible CDN link for Paho MQTT library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
 </head>
 <body>
-    <h1>MQTT Web Client</h1>
-    <label for="broker">Broker:</label>
-    <input type="text" id="broker" value="wss://broker.hivemq.com:8000/mqtt">
-    <br><br>
-    <label for="topic">Topic:</label>
-    <input type="text" id="topic">
-    <br><br>
-    <label for="message">Message:</label>
-    <input type="text" id="message">
-    <br><br>
-    <button onclick="connectAndSend()">Send Message</button>
-
+    <h1>Mouse Coordinates Sender</h1>
+    <p>Move your mouse around to send coordinates over MQTT.</p>
+    
     <script>
-        let client;
+        // MQTT Broker details
+        const MQTT_BROKER = "broker.hivemq.com";
+        const MQTT_PORT = 8884;
+        const MQTT_TOPIC = "com/mampersat/mousecoords";
 
-        function connectAndSend() {
-            const broker = document.getElementById('broker').value;
-            const topic = document.getElementById('topic').value;
-            const message = document.getElementById('message').value;
+        // Create a client instance
+        const clientID = "mqtt_js_" + Math.random().toString(16).substr(2, 8);
+        const client = new Paho.Client(MQTT_BROKER, MQTT_PORT, clientID);
 
-            // Create a client instance
-            client = new Paho.MQTT.Client(broker, "clientId-" + Math.random());
-
-            // Set callback handlers
-            client.onConnectionLost = onConnectionLost;
-            client.onMessageArrived = onMessageArrived;
-
-            // Connect the client
-            client.connect({ onSuccess: onConnect });
-
-            // Called when the client connects
-            function onConnect() {
-                console.log("Connected to broker: " + broker);
-
-                // Create a message and send it to the topic
-                const mqttMessage = new Paho.MQTT.Message(message);
-                mqttMessage.destinationName = topic;
-                client.send(mqttMessage);
-
-                console.log("Message sent: " + message + " to topic: " + topic);
+        // Set callback handlers
+        client.onConnectionLost = function (responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:", responseObject.errorMessage);
             }
+        };
 
-            // Called when the client loses its connection
-            function onConnectionLost(responseObject) {
-                if (responseObject.errorCode !== 0) {
-                    console.log("onConnectionLost: " + responseObject.errorMessage);
-                }
-            }
+        client.onMessageArrived = function (message) {
+            console.log("onMessageArrived:", message.payloadString);
+        };
 
-            // Called when a message arrives
-            function onMessageArrived(message) {
-                console.log("onMessageArrived: " + message.payloadString);
-            }
+        // Connect the client
+        client.connect({
+            onSuccess: onConnect,
+            useSSL: true
+        });
+
+        // Called when the client connects
+        function onConnect() {
+            console.log("Connected to MQTT broker");
+            // Subscribe to a topic (optional, for receiving messages)
+            // client.subscribe(MQTT_TOPIC);
         }
+
+        // Send mouse coordinates over MQTT
+        function sendMouseCoords(x, y) {
+            const message = new Paho.Message(JSON.stringify({ x: x, y: y }));
+            message.destinationName = MQTT_TOPIC;
+            client.send(message);
+        }
+
+        // Listen for mouse move events
+        document.addEventListener('mousemove', function(event) {
+            const x = event.clientX;
+            const y = event.clientY;
+            sendMouseCoords(x, y);
+        });
     </script>
 </body>
 </html>

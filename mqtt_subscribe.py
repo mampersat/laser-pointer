@@ -6,7 +6,8 @@ import machine
 # MQTT Server Parameters
 MQTT_BROKER = "broker.hivemq.com"
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
-MQTT_TOPIC = b"com.mampersat/neopixel/1"
+#MQTT_TOPIC = b"com.mampersat/neopixel/1"
+MQTT_TOPIC = b"com/mampersat/mousecoords"
 
 # Callback when a message is received
 def sub_cb(topic, msg):
