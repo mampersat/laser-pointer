@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mouse Tracker</title>
+</head>
+<body>
+    <h1>Move your mouse around!</h1>
+    <script>
+        const ws = new WebSocket('ws://192.168.1.188:8765');
+
+        ws.onopen = () => {
+            console.log('Connected to the WebSocket server');
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error: ', error);
+        };
+
+        document.addEventListener('mousemove', (event) => {
+            const coordinates = {
+                x: event.clientX,
+                y: event.clientY
+            };
+            ws.send(JSON.stringify(coordinates));
+        });
+    </script>
+</body>
+</html>

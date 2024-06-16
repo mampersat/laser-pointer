@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Web Client</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+</head>
+<body>
+    <h1>MQTT Web Client</h1>
+    <label for="broker">Broker:</label>
+    <input type="text" id="broker" value="wss://broker.hivemq.com:8000/mqtt">
+    <br><br>
+    <label for="topic">Topic:</label>
+    <input type="text" id="topic">
+    <br><br>
+    <label for="message">Message:</label>
+    <input type="text" id="message">
+    <br><br>
+    <button onclick="connectAndSend()">Send Message</button>
+
+    <script>
+        let client;
+
+        function connectAndSend() {
+            const broker = document.getElementById('broker').value;
+            const topic = document.getElementById('topic').value;
+            const message = document.getElementById('message').value;
+
+            // Create a client instance
+            client = new Paho.MQTT.Client(broker, "clientId-" + Math.random());
+
+            // Set callback handlers
+            client.onConnectionLost = onConnectionLost;
+            client.onMessageArrived = onMessageArrived;
+
+            // Connect the client
+            client.connect({ onSuccess: onConnect });
+
+            // Called when the client connects
+            function onConnect() {
+                console.log("Connected to broker: " + broker);
+
+                // Create a message and send it to the topic
+                const mqttMessage = new Paho.MQTT.Message(message);
+                mqttMessage.destinationName = topic;
+                client.send(mqttMessage);
+
+                console.log("Message sent: " + message + " to topic: " + topic);
+            }
+
+            // Called when the client loses its connection
+            function onConnectionLost(responseObject) {
+                if (responseObject.errorCode !== 0) {
+                    console.log("onConnectionLost: " + responseObject.errorMessage);
+                }
+            }
+
+            // Called when a message arrives
+            function onMessageArrived(message) {
+                console.log("onMessageArrived: " + message.payloadString);
+            }
+        }
+    </script>
+</body>
+</html>
