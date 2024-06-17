@@ -15,20 +15,18 @@ laser = machine.Pin(16, machine.Pin.OUT)
 laser.on()
 
 np = neopixel.NeoPixel(machine.Pin(28), 5)
-servo_x = machine.PWM(machine.Pin(17))
-servo_y = machine.PWM(machine.Pin(18))
-servo_x.freq(50)
-servo_y.freq(50)
+servo_x = machine.PWM(machine.Pin(17), freq=50)
+servo_y = machine.PWM(machine.Pin(18), freq=50)
 
 # Servo x configuration
-servo_x_left = 970000
-servo_x_right = 470000
+servo_x_left = 3_000_000
+servo_x_right = 600_000
 x_min = 0
 x_max = 1000
 
 # Servo y configuration
-servo_y_top = 1370000
-servo_y_bottom = 1670000
+servo_y_top = 600_000
+servo_y_bottom = 3_000_000
 y_min = 0
 y_max = 1000
 

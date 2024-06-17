@@ -6,11 +6,28 @@
     <title>Mouse Coordinates over MQTT</title>
     <!-- Ensure correct and accessible CDN link for Paho MQTT library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Mouse Coordinates Sender</h1>
-    <p>Move your mouse around to send coordinates over MQTT.</p>
-    
+    <p>Click anywhere to toggle tracking of mouse coordinates.</p>
+    <p class="status" id="status">Tracking: OFF</p>
+
     <script>
         // MQTT Broker details
         const MQTT_BROKER = "broker.hivemq.com";
@@ -41,7 +58,7 @@
         // Called when the client connects
         function onConnect() {
             console.log("Connected to MQTT broker");
-            // Subscribe to a topic (optional, for receiving messages)
+            // Optionally subscribe to a topic
             // client.subscribe(MQTT_TOPIC);
         }
 
@@ -52,12 +69,32 @@
             client.send(message);
         }
 
-        // Listen for mouse move events
-        document.addEventListener('mousemove', function(event) {
-            const x = event.clientX;
-            const y = event.clientY;
-            sendMouseCoords(x, y);
-        });
+        let isTracking = false;
+        const statusElement = document.getElementById('status');
+
+        // Event listener for mouse move
+        function mouseMoveHandler(event) {
+            if (isTracking) {
+                const x = event.clientX;
+                const y = event.clientY;
+                sendMouseCoords(x, y);
+            }
+        }
+
+        // Toggle tracking function
+        function toggleTracking() {
+            isTracking = !isTracking;
+            if (isTracking) {
+                document.addEventListener('mousemove', mouseMoveHandler);
+                statusElement.textContent = "Tracking: ON";
+            } else {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                statusElement.textContent = "Tracking: OFF";
+            }
+        }
+
+        // Add click event listener to the entire document
+        document.addEventListener('click', toggleTracking);
     </script>
 </body>
 </html>
