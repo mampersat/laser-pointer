@@ -36,7 +36,6 @@ def map_value(value, in_min, in_max, out_min, out_max):
 
 # Callback when a message is received
 def sub_cb(topic, msg):
-    print((topic, msg))
     payload_dict = json.loads(msg)
     x = payload_dict['x']
     y = payload_dict['y']
@@ -48,6 +47,7 @@ def sub_cb(topic, msg):
     servo_x_mapped = map_value(x, x_min, x_max, servo_x_left, servo_x_right)
     servo_y_mapped = map_value(y, y_min, y_max, servo_y_top, servo_y_bottom)            
     
+    print(f'tracking to {servo_x_mapped}, {servo_y_mapped}')
     servo_x.duty_ns(servo_x_mapped)
     servo_y.duty_ns(servo_y_mapped)
 

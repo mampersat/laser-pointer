@@ -6,3 +6,4 @@ t.laser.on()
 import pickle
 anchors = pickle.load(open("anchors.p", "rb"))
 print('When done, run\npickle.dump(anchors, open("anchors.p", "wb"))')
+

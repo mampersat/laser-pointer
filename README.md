@@ -41,3 +41,22 @@ Brisbane
 Not 100% perfect, but here's the plan
 1. Manually locate a bunch of points using calibration setup
 1. To project a new point, find the 2 closest and extrapolate along a line between them
+
+## Raspberry PI pico
+installint umqtt library
+```
+import mip
+mip.install("umqtt.simple")
+```
+# 2024-06-16
+x and y rand is 0 to 1000
+
+servo x
+left = 970000
+right = 470000
+
+servo y
+top = 1370000
+bottom = 1670000
+
+
