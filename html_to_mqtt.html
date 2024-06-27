@@ -1,82 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouse Coordinates over MQTT</title>
     <!-- Ensure correct and accessible CDN link for Paho MQTT library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
+    <!-- Include the refactored MQTT handler -->
+    <script src="mqttHandler.js"></script>
     <style>
         body {
+            background-color: #121212;
+            /* Dark background */
+            color: #e0e0e0;
+            /* Light text */
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .left-panel,
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-panel {
+            background: url('images/nat_geo_the_world.jpg') no-repeat center center;
+            background-size: contain;
+        }
+
         .status {
             margin-top: 20px;
             font-size: 20px;
+            color: #90ee90;
+            /* Light green for status messages for better visibility */
+        }
+
+        .log-window {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background-color: #333;
+            color: #fff;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
         }
     </style>
 </head>
+
 <body>
-    <h1>Mouse Coordinates Sender</h1>
-    <p>Click anywhere to toggle tracking of mouse coordinates.</p>
-    <p class="status" id="status">Tracking: OFF</p>
+
+    <div class="container">
+        <div class="left-panel">
+            <h1>Mouse Coordinates Sender</h1>
+            <p>Click anywhere to toggle tracking of mouse coordinates.</p>
+            <p class="status" id="status">Tracking: OFF</p>
+        </div>
+        <div class="right-panel"></div>
+    </div>
 
     <script>
-        // MQTT Broker details
-        const MQTT_BROKER = "broker.hivemq.com";
-        const MQTT_PORT = 8884;
-        const MQTT_TOPIC = "com/mampersat/mousecoords";
-
-        // Create a client instance
-        const clientID = "mqtt_js_" + Math.random().toString(16).substr(2, 8);
-        const client = new Paho.Client(MQTT_BROKER, MQTT_PORT, clientID);
-
-        // Set callback handlers
-        client.onConnectionLost = function (responseObject) {
-            if (responseObject.errorCode !== 0) {
-                console.log("onConnectionLost:", responseObject.errorMessage);
-            }
-        };
-
-        client.onMessageArrived = function (message) {
-            console.log("onMessageArrived:", message.payloadString);
-        };
-
-        // Connect the client
-        client.connect({
-            onSuccess: onConnect,
-            useSSL: true
-        });
-
-        // Called when the client connects
-        function onConnect() {
-            console.log("Connected to MQTT broker");
-            // Optionally subscribe to a topic
-            // client.subscribe(MQTT_TOPIC);
-        }
-
-        // Send mouse coordinates over MQTT
-        function sendMouseCoords(x, y) {
-            const message = new Paho.Message(JSON.stringify({ x: x, y: y }));
-            message.destinationName = MQTT_TOPIC;
-            client.send(message);
-        }
-
         let isTracking = false;
         const statusElement = document.getElementById('status');
+        let lastMouseCoords = { x: 0, y: 0 }; // Global variable to store the last mouse coordinates
 
         // Event listener for mouse move
         function mouseMoveHandler(event) {
+            const x = event.clientX * 2;
+            const y = event.clientY;
+            lastMouseCoords = { x, y };
+
             if (isTracking) {
-                const x = event.clientX;
-                const y = event.clientY;
+                // Check if the mouse is on the left side of the page
+                if (event.clientX > document.documentElement.clientWidth / 2) {
+                    return; // Do nothing if the mouse is on the right side
+                }
                 sendMouseCoords(x, y);
             }
         }
@@ -85,16 +99,32 @@
         function toggleTracking() {
             isTracking = !isTracking;
             if (isTracking) {
-                document.addEventListener('mousemove', mouseMoveHandler);
                 statusElement.textContent = "Tracking: ON";
             } else {
-                document.removeEventListener('mousemove', mouseMoveHandler);
                 statusElement.textContent = "Tracking: OFF";
             }
         }
 
         // Add click event listener to the entire document
         document.addEventListener('click', toggleTracking);
+        document.addEventListener('mousemove', mouseMoveHandler);
+
+        // Add keypress event listener for logging on Enter key press
+        document.addEventListener('keypress', function (event) {
+            if (event.key === "Enter") {
+                // Log the last known mouse coordinates
+                console.log(`Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y})`);
+                // Optionally, update the log window with the last known mouse coordinates
+                const logWindow = document.getElementById('logWindow');
+                logWindow.innerHTML += `<p>Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y})</p>`;
+                logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
+            }
+        });
     </script>
+
+
+
+    <div class="log-window" id="logWindow">Log Messages:</div>
 </body>
+
 </html>
