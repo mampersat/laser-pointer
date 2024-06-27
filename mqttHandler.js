@@ -32,6 +32,8 @@ function onConnect() {
 }
 
 // Send mouse coordinates over MQTT
+// x = 0 -> 1000
+// y = 0 -> 1000
 function sendMouseCoords(x, y) {
     const message = new Paho.Message(JSON.stringify({ x: x, y: y }));
     message.destinationName = MQTT_TOPIC;

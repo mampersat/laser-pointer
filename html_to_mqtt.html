@@ -75,6 +75,8 @@
         <div class="right-panel"></div>
     </div>
 
+    <div class="log-window" id="logWindow">Log Messages:</div>
+
     <script>
         let isTracking = false;
         const statusElement = document.getElementById('status');
@@ -82,8 +84,9 @@
 
         // Event listener for mouse move
         function mouseMoveHandler(event) {
-            const x = event.clientX * 2;
+            const x = event.clientX;
             const y = event.clientY;
+
             lastMouseCoords = { x, y };
 
             if (isTracking) {
@@ -91,7 +94,24 @@
                 if (event.clientX > document.documentElement.clientWidth / 2) {
                     return; // Do nothing if the mouse is on the right side
                 }
-                sendMouseCoords(x, y);
+
+                // convert mouse co-ords from left panel dimensions to 0-1000 
+                leftPanelElement = document.querySelector('.left-panel');
+                turret_x = Math.round((x / leftPanelElement.clientWidth) * 1000);
+                turret_y = Math.round((y / leftPanelElement.clientHeight) * 1000);
+                sendMouseCoords(turret_x, turret_y);
+            }
+        }
+
+        function enterClickedHandler(event) {
+            const clientWidth = document.documentElement.clientWidth;
+            const logWindow = document.getElementById('logWindow');
+
+            if (event.key === "Enter") {
+                const panelSide = lastMouseCoords.x > clientWidth / 2 ? 'Right' : 'Left';
+
+                logWindow.innerHTML += `<p>Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y}) - ${panelSide} Panel</p>`;
+                logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
             }
         }
 
@@ -104,27 +124,11 @@
                 statusElement.textContent = "Tracking: OFF";
             }
         }
-
-        // Add click event listener to the entire document
+        document.addEventListener('keypress', enterClickedHandler);
         document.addEventListener('click', toggleTracking);
         document.addEventListener('mousemove', mouseMoveHandler);
-
-        // Add keypress event listener for logging on Enter key press
-        document.addEventListener('keypress', function (event) {
-            if (event.key === "Enter") {
-                // Log the last known mouse coordinates
-                console.log(`Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y})`);
-                // Optionally, update the log window with the last known mouse coordinates
-                const logWindow = document.getElementById('logWindow');
-                logWindow.innerHTML += `<p>Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y})</p>`;
-                logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
-            }
-        });
     </script>
 
-
-
-    <div class="log-window" id="logWindow">Log Messages:</div>
 </body>
 
 </html>
