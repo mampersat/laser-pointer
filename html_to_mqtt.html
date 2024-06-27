@@ -37,16 +37,15 @@
             justify-content: center;
         }
 
-        .right-panel {
-            background: url('images/nat_geo_the_world.jpg') no-repeat center center;
-            background-size: contain;
+        .right-panel img {
+            width: 100%;
+            height: auto;
         }
 
         .status {
             margin-top: 20px;
             font-size: 20px;
             color: #90ee90;
-            /* Light green for status messages for better visibility */
         }
 
         .log-window {
@@ -72,7 +71,9 @@
             <p>Click anywhere to toggle tracking of mouse coordinates.</p>
             <p class="status" id="status">Tracking: OFF</p>
         </div>
-        <div class="right-panel"></div>
+        <div class="right-panel">
+            <img id="nat_geo_the_world" src="images/nat_geo_the_world.jpg" alt="World Map">
+        </div>
     </div>
 
     <div class="log-window" id="logWindow">Log Messages:</div>
@@ -80,42 +81,39 @@
     <script>
         let isTracking = false;
         const statusElement = document.getElementById('status');
-        let lastMouseCoords = { x: 0, y: 0 }; // Global variable to store the last mouse coordinates
+        let lastLaserCoords = { x: 0, y: 0 };
+        let lastImageCoords = { x: 0, y: 0 };
 
-        // Event listener for mouse move
         function mouseMoveHandler(event) {
-            const x = event.clientX;
-            const y = event.clientY;
-
-            lastMouseCoords = { x, y };
-
             if (isTracking) {
                 // Check if the mouse is on the left side of the page
                 if (event.clientX > document.documentElement.clientWidth / 2) {
                     return; // Do nothing if the mouse is on the right side
                 }
 
+                const x = event.clientX;
+                const y = event.clientY;
+
                 // convert mouse co-ords from left panel dimensions to 0-1000 
                 leftPanelElement = document.querySelector('.left-panel');
-                turret_x = Math.round((x / leftPanelElement.clientWidth) * 1000);
-                turret_y = Math.round((y / leftPanelElement.clientHeight) * 1000);
+                const turret_x = Math.round((x / leftPanelElement.clientWidth) * 1000);
+                const turret_y = Math.round((y / leftPanelElement.clientHeight) * 1000);
+                lastLaserCoords = { x: turret_x, y: turret_y };
+
                 sendMouseCoords(turret_x, turret_y);
             }
         }
 
         function enterClickedHandler(event) {
-            const clientWidth = document.documentElement.clientWidth;
-            const logWindow = document.getElementById('logWindow');
-
             if (event.key === "Enter") {
-                const panelSide = lastMouseCoords.x > clientWidth / 2 ? 'Right' : 'Left';
+                const logWindow = document.getElementById('logWindow');
 
-                logWindow.innerHTML += `<p>Last Mouse Position: (${lastMouseCoords.x}, ${lastMouseCoords.y}) - ${panelSide} Panel</p>`;
+                message = `(${lastLaserCoords.x}, ${lastLaserCoords.y}) -> (${lastImageCoords.x}, ${lastImageCoords.y})`;
+                logWindow.innerHTML += `<p>${message}</p>`;
                 logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
             }
         }
 
-        // Toggle tracking function
         function toggleTracking() {
             isTracking = !isTracking;
             if (isTracking) {
@@ -124,11 +122,19 @@
                 statusElement.textContent = "Tracking: OFF";
             }
         }
+
         document.addEventListener('keypress', enterClickedHandler);
         document.addEventListener('click', toggleTracking);
         document.addEventListener('mousemove', mouseMoveHandler);
-    </script>
 
+        document.getElementById('nat_geo_the_world').addEventListener('mousemove', function (event) {
+            const bounds = this.getBoundingClientRect(); // Get the position and size of the image
+            const x = event.clientX - bounds.left; // Calculate the X coordinate relative to the image
+            const y = event.clientY - bounds.top; // Calculate the Y coordinate relative to the image
+
+            lastImageCoords = { x, y };
+        });
+    </script>
 </body>
 
 </html>
