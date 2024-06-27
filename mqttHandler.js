@@ -3,7 +3,7 @@
 // MQTT Broker details
 const MQTT_BROKER = "broker.hivemq.com";
 const MQTT_PORT = 8884;
-const MQTT_TOPIC = "com/mampersat/mousecoords";
+const MQTT_TOPIC = "com/mampersat/laser/goto";
 
 // Create a client instance
 const clientID = "mqtt_js_" + Math.random().toString(16).substr(2, 8);

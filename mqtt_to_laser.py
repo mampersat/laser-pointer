@@ -9,7 +9,7 @@ import wifi
 MQTT_BROKER = "broker.hivemq.com"
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 #MQTT_TOPIC = b"com.mampersat/neopixel/1"
-MQTT_TOPIC = b"com/mampersat/mousecoords"
+MQTT_TOPIC = b"com/mampersat/#"
 
 laser = machine.Pin(16, machine.Pin.OUT)
 laser.on()
@@ -36,6 +36,11 @@ def map_value(value, in_min, in_max, out_min, out_max):
 
 # Callback when a message is received
 def sub_cb(topic, msg):
+    print(f'topic={topic}')
+    if topic == b'com/mampersat/laser/goto':
+        goto(msg)
+
+def goto(msg):
     payload_dict = json.loads(msg)
     x = payload_dict['x']
     y = payload_dict['y']
