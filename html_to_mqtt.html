@@ -108,23 +108,44 @@
             if (event.key === "Enter") {
                 const logWindow = document.getElementById('logWindow');
 
-                message = `(${lastLaserCoords.x}, ${lastLaserCoords.y}) -> (${lastImageCoords.x}, ${lastImageCoords.y})`;
-                logWindow.innerHTML += `<p>${message}</p>`;
+                mapping = {
+                    x: lastLaserCoords.x,
+                    y: lastLaserCoords.y,
+                    image_x: lastImageCoords.x,
+                    image_y: lastImageCoords.y
+                };
+
+                message = `Sending mapping: ${JSON.stringify(mapping)}`;
+                logWindow.innerHTML += `<p>message: ${message}</p>`;
                 logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
+                sendMappingCoords(mapping);
             }
         }
 
-        function toggleTracking() {
-            isTracking = !isTracking;
-            if (isTracking) {
-                statusElement.textContent = "Tracking: ON";
-            } else {
-                statusElement.textContent = "Tracking: OFF";
+        function clickHandler() {
+            if (event.clientX > document.documentElement.clientWidth / 2) {
+                find_coords = {
+                    x: lastImageCoords.x,
+                    y: lastImageCoords.y
+                };
+                message = `Sending find coords: ${JSON.stringify(find_coords)}`;
+                logWindow.innerHTML += `<p>message: ${message}</p>`;
+                logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to the latest log message
+                sendFindCoords(find_coords);
+            }
+            else {
+                isTracking = !isTracking;
+                if (isTracking) {
+                    statusElement.textContent = "Tracking: ON";
+                } else {
+                    statusElement.textContent = "Tracking: OFF";
+                }
+
             }
         }
 
         document.addEventListener('keypress', enterClickedHandler);
-        document.addEventListener('click', toggleTracking);
+        document.addEventListener('click', clickHandler);
         document.addEventListener('mousemove', mouseMoveHandler);
 
         document.getElementById('nat_geo_the_world').addEventListener('mousemove', function (event) {

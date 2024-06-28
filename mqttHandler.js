@@ -3,7 +3,9 @@
 // MQTT Broker details
 const MQTT_BROKER = "broker.hivemq.com";
 const MQTT_PORT = 8884;
-const MQTT_TOPIC = "com/mampersat/laser/goto";
+const MQTT_TOPIC_GOTO = "com/mampersat/laser/goto";
+const MQTT_TOPIC_MAP = "com/mampersat/laser/map";
+const MQTT_TOPIC_FIND = "com/mampersat/laser/find";
 
 // Create a client instance
 const clientID = "mqtt_js_" + Math.random().toString(16).substr(2, 8);
@@ -36,6 +38,20 @@ function onConnect() {
 // y = 0 -> 1000
 function sendMouseCoords(x, y) {
     const message = new Paho.Message(JSON.stringify({ x: x, y: y }));
-    message.destinationName = MQTT_TOPIC;
+    message.destinationName = MQTT_TOPIC_GOTO;
+    client.send(message);
+}
+
+// Send mapping coordinates over MQTT
+function sendMappingCoords(mapping) {
+    const message = new Paho.Message(JSON.stringify(mapping));
+    message.destinationName = MQTT_TOPIC_MAP;
+    client.send(message);
+}
+
+// Send find coordinates over MQTT
+function sendFindCoords(find) {
+    const message = new Paho.Message(JSON.stringify(find));
+    message.destinationName = MQTT_TOPIC_FIND;
     client.send(message);
 }

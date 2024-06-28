@@ -30,22 +30,34 @@ servo_y_bottom = 3_000_000
 y_min = 0
 y_max = 1000
 
+mapping_dict = {}
+
 def map_value(value, in_min, in_max, out_min, out_max):
     # Map value from the input range [in_min, in_max] to the output range [out_min, out_max]
     return int((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
 # Callback when a message is received
 def sub_cb(topic, msg):
+    np[0] = (0,100,0)
     print(f'topic={topic}')
+    print(f'msg={msg}')
     if topic == b'com/mampersat/laser/goto':
         goto(msg)
+    
+    if topic == b'com/mampersat/laser/map':
+        map_coord(msg)
+
+    if topic == b'com/mampersat/laser/find':
+        find(msg)
+
+    np[0] = (0,0,0)
 
 def goto(msg):
     payload_dict = json.loads(msg)
     x = payload_dict['x']
     y = payload_dict['y']
 
-    np[1] = (x, y, 0)
+    np[1] = (int(x), int(y), 0)
     np.write()
 
     # Map x and y to servo_x and servo_y positions
@@ -55,6 +67,36 @@ def goto(msg):
     print(f'tracking to {servo_x_mapped}, {servo_y_mapped}')
     servo_x.duty_ns(servo_x_mapped)
     servo_y.duty_ns(servo_y_mapped)
+
+def map_coord(msg):
+    payload_dict = json.loads(msg)
+
+    mouse_x = payload_dict['x']
+    mouse_y = payload_dict['y']
+    map_x = payload_dict['image_x']
+    map_y = payload_dict['image_y']
+    # add new mapping to mapping dict
+    new_mapping = {(mouse_x, mouse_y): (map_x, map_y)}
+
+    print(f'new mapping: {new_mapping}')
+    mapping_dict.update(new_mapping)
+
+def find(msg):
+    payload_dict = json.loads(msg)
+    mouse_x = payload_dict['x']
+    mouse_y = payload_dict['y']
+
+    # find the closest mapping
+    closest_mapping = None
+    min_distance = 1000000
+    for key, value in mapping_dict.items():
+        distance = ((value[0] - mouse_x)**2 + (value[1] - mouse_y)**2)**0.5
+        if distance < min_distance:
+            closest_mapping = key
+            min_distance = distance
+
+    print(f'closest mapping: {closest_mapping}')
+    goto(json.dumps({'x': closest_mapping[0], 'y': closest_mapping[1]}))
 
 
 # Setup MQTT Client and Subscribe
