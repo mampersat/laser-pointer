@@ -1,6 +1,35 @@
 # laser-pointer
 laser mounted on simple servo turret to point to interesting locations on a map
 
+## Communications
+```mermaid
+sequenceDiagram
+    participant Browser as Web Browser
+    participant Hub as MQTT Hub
+    participant Turret as Laser Turret Device
+
+    Browser->>+Hub: Publish "target coordinates"
+
+    Hub->>+Turret: Forward "target coordinates"
+
+    Turret->>+Turret: Point laser to coordinates
+```    
+
+## Wiring
+```mermaid
+graph LR
+    servo1 -- black(-) --> pico38[pico pin 38]
+    servo1 -- red(+) --> pico36[pico pin 36]
+    servo1 -- white --> pico22[pico pin 22]
+
+    servo2 -- black(-) --> pico38[pico pin 38]
+    servo2 -- red(+) --> pico36[pico pin 36]
+    servo2 -- white --> pico24[pico pin 24]
+
+    laser -- black(-) --> pico38[pico pin 38]
+    laser -- white --> pico16[pico pin 16]
+```
+
 ![turret on block](images/turret_on_block.jpg)
 
 I have a large map (9ft x 6ft) in my home office. It's a triumph of cartography really. [You can get it here for $100](https://www.natgeomaps.com/re-world-executive-mural). Installation is the same as wall paper.

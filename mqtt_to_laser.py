@@ -4,6 +4,7 @@ import json
 import machine
 import neopixel
 import wifi
+import time
 
 # MQTT Server Parameters
 MQTT_BROKER = "broker.hivemq.com"
