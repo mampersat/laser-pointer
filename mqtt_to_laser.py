@@ -5,6 +5,7 @@ import machine
 import neopixel
 import wifi
 import time
+import random
 
 # MQTT Server Parameters
 MQTT_BROKER = "broker.hivemq.com"
@@ -31,19 +32,75 @@ servo_y_bottom = 3_000_000
 y_min = 0
 y_max = 1000
 
-mapping_dict = {}
+#######################################
+## New data structure to store mappings
+#######################################
 
-def save_mapping_dict():
-    with open('mapping_dict.json', 'w') as f:
-        json.dump(mapping_dict, f)
+# Define a dictionary to store the mappings
+coordinate_mappings = {
+    "laser_to_image": {},
+    "image_to_laser": {}
+}
 
-def read_mapping_dict():
+def add_mapping(laser_x, laser_y, image_x, image_y):
+    coordinate_mappings["laser_to_image"][(laser_x, laser_y)] = (image_x, image_y)
+    coordinate_mappings["image_to_laser"][(image_x, image_y)] = (laser_x, laser_y)
+
+def get_image_from_laser(laser_x, laser_y):
+    return coordinate_mappings["laser_to_image"].get((laser_x, laser_y))
+
+def get_laser_from_image(image_x, image_y):
+    return coordinate_mappings["image_to_laser"].get((image_x, image_y))
+
+
+def find(msg):
+    """ Find the closest image point and navigate to the laser point"""
+    payload_dict = json.loads(msg)
+    image_x = payload_dict['x']
+    image_y = payload_dict['y']
+
+    # goto the first position
+    d = coordinate_mappings["image_to_laser"]
+    r = random.choice(list(d.items()))
+
+    # find closest point in image_to_laser
+    min_distance = 1000000
+    for k, v in d.items():
+        # pull x and y out of the key which is a string
+        x, y = map(float, k.strip('[]').split(', '))
+        distance = (image_x - x)**2 + (image_y - y)**2
+        if distance < min_distance:
+            min_distance = distance
+            r = v
+
+    print(r)
+    print(f'min_distance={min_distance}')
+          
+    # Navigate to the found laser point
+    goto(json.dumps({"x": int(r[0]), "y": int(r[1])}))
+
+def save_coordinate_mappings():
+    with open('coordinate_mappings.json', 'w') as f:
+        json.dump(coordinate_mappings, f)
+
+def clear_coordinate_mappings():
+    global coordinate_mappings
+    coordinate_mappings = {
+        "laser_to_image": {},
+        "image_to_laser": {}
+    }
+    save_coordinate_mappings()
+
+def read_coordinate_mappings():
     try:
-        with open('mapping_dict.json', 'r') as f:
-            mapping_dict = json.load(f)
+        with open('coordinate_mappings.json', 'r') as f:
+            coordinate_mappings = json.load(f)
     except:
-        mapping_dict = {}
-    return mapping_dict
+        coordinate_mappings = {
+           "laser_to_image": {},
+            "image_to_laser": {}
+        }
+    return coordinate_mappings
 
 def map_value(value, in_min, in_max, out_min, out_max):
     # Map value from the input range [in_min, in_max] to the output range [out_min, out_max]
@@ -86,46 +143,13 @@ def goto(msg):
 def map_coord(msg):
     payload_dict = json.loads(msg)
 
-    mouse_x = payload_dict['x']
-    mouse_y = payload_dict['y']
-    map_x = payload_dict['image_x']
-    map_y = payload_dict['image_y']
-    # add new mapping to mapping dict
-    new_mapping = {(mouse_x, mouse_y): (map_x, map_y)}
+    laser_x = payload_dict['x']
+    laser_y = payload_dict['y']
+    image_x = payload_dict['image_x']
+    image_y = payload_dict['image_y']
 
-    print(f'new mapping: {new_mapping}')
-    mapping_dict.update(new_mapping)
-
-def find(msg):
-    payload_dict = json.loads(msg)
-    mouse_x = payload_dict['x']
-    mouse_y = payload_dict['y']
-
-    # Collect distances and their corresponding mappings
-    distances = []
-    for key, value in mapping_dict.items():
-        distance = ((value[0] - mouse_x)**2 + (value[1] - mouse_y)**2)**0.5
-        distances.append((distance, key))
-
-    # Sort by distance and take the two closest
-    distances.sort(key=lambda x: x[0])
-    closest_two = distances[:2]
-
-    # goto closest point
-    print(distances)
-    closest = distances[0]
-    print(closest)
-    x = closest[1][0]
-    y = closest[1][1]
-    goto(json.dumps({'x': x, 'y': y}))
-
-    
-    # Extrapolate by calculating the midpoint between the two closest points
-    midpoint_x = (mapping_dict[closest_two[0][1]][0] + mapping_dict[closest_two[1][1]][0]) / 2
-    midpoint_y = (mapping_dict[closest_two[0][1]][1] + mapping_dict[closest_two[1][1]][1]) / 2
-
-    print(f'Extrapolated point: ({midpoint_x}, {midpoint_y})')
-    goto(json.dumps({'x': midpoint_x, 'y': midpoint_y}))
+    add_mapping(laser_x, laser_y, image_x, image_y)
+    save_coordinate_mappings()
 
 # Setup MQTT Client and Subscribe
 def mqtt_subscribe():
@@ -143,8 +167,8 @@ def mqtt_subscribe():
     finally:
         client.disconnect()
 
-mapping_dict = read_mapping_dict()
-print(f'Loaded mapping_dict: {mapping_dict}')
+coordinate_mappings = read_coordinate_mappings()
+print(f'Loaded mapping_dict: {coordinate_mappings}')
 
 # Run the MQTT subscription
 mqtt_subscribe()

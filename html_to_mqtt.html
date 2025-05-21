@@ -111,8 +111,8 @@
                 mapping = {
                     x: lastLaserCoords.x,
                     y: lastLaserCoords.y,
-                    image_x: lastImageCoords.x,
-                    image_y: lastImageCoords.y
+                    image_x: lastImageCoords.x_percent,
+                    image_y: lastImageCoords.y_percent
                 };
 
                 message = `Sending mapping: ${JSON.stringify(mapping)}`;
@@ -125,8 +125,8 @@
         function clickHandler() {
             if (event.clientX > document.documentElement.clientWidth / 2) {
                 find_coords = {
-                    x: lastImageCoords.x,
-                    y: lastImageCoords.y
+                    x: lastImageCoords.x_percent,
+                    y: lastImageCoords.y_percent
                 };
                 message = `Sending find coords: ${JSON.stringify(find_coords)}`;
                 logWindow.innerHTML += `<p>message: ${message}</p>`;
@@ -153,7 +153,11 @@
             const x = event.clientX - bounds.left; // Calculate the X coordinate relative to the image
             const y = event.clientY - bounds.top; // Calculate the Y coordinate relative to the image
 
-            lastImageCoords = { x, y };
+            const x_percent = x / bounds.width;
+            const y_percent = y / bounds.height;
+            
+            lastImageCoords = {x_percent, y_percent};
+
         });
     </script>
 </body>
